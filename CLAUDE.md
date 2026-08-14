@@ -4,14 +4,14 @@ Playwright + TypeScript framework testing a self-hosted OrangeHRM. Repo is **pub
 
 ## Commands
 
-| Task | Command |
-|---|---|
-| Start app | `npm run app:up` (http://localhost:8080) |
-| Stop app | `npm run app:down` |
-| Wipe + restart app | `npm run app:reset` |
-| Run tests | `npm test` |
-| Interactive runner | `npm run test:ui` |
-| View report | `npm run report` |
+| Task                  | Command                                                 |
+| --------------------- | ------------------------------------------------------- |
+| Start app             | `npm run app:up` (http://localhost:8080)                |
+| Stop app              | `npm run app:down`                                      |
+| Wipe + restart app    | `npm run app:reset`                                     |
+| Run tests             | `npm test`                                              |
+| Interactive runner    | `npm run test:ui`                                       |
+| View report           | `npm run report`                                        |
 | Lint / format / types | `npm run lint` / `npm run format` / `npm run typecheck` |
 
 ## Directory map

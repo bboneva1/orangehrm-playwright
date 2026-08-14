@@ -10,6 +10,7 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
 
   {
+    files: ['**/*.ts'],
     rules: {
       // Test code legitimately uses non-null assertions less than app code does -
       // if you need `!`, you probably need a proper assertion instead.
@@ -21,7 +22,7 @@ export default tseslint.config(
       '@typescript-eslint/no-floating-promises': 'error',
     },
     languageOptions: {
-      parserOptions: { projectService: true },  // needed for type-aware rules above
+      parserOptions: { projectService: true }, // needed for type-aware rules above
     },
   },
 

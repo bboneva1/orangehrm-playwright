@@ -1,1 +1,3 @@
-npm test
+gitleaks git --staged --redact --verbose
+npx prettier --check .
+npx eslint .

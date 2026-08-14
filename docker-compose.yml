@@ -21,7 +21,7 @@ services:
     healthcheck:
       # The app container starts faster than MariaDB accepts connections.
       # Without a healthcheck the installer errors on first boot.
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
       interval: 10s
       timeout: 5s
       retries: 10
@@ -36,7 +36,7 @@ services:
     ports:
       # host:container - app will be at http://localhost:8080
       # 8080 not 80: 80 often collides with other things on Windows.
-      - "8080:80"
+      - '8080:80'
     environment:
       ORANGEHRM_DATABASE_HOST: orangehrm-db
       ORANGEHRM_DATABASE_PORT: 3306

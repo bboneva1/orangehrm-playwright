@@ -2,13 +2,13 @@
   "compilerOptions": {
     // Target/lib: Node 20+ supports modern JS, so no need to downlevel.
     "target": "ES2022",
-    "lib": ["ES2022", "DOM"],           // DOM because page.evaluate() runs browser-side code
+    "lib": ["ES2022", "DOM"], // DOM because page.evaluate() runs browser-side code
     "module": "ESNext",
     "moduleResolution": "bundler",
 
     // Strictness. Turn these on now - retrofitting strict mode later is painful.
     "strict": true,
-    "noUncheckedIndexedAccess": true,   // arr[0] is T | undefined. Catches real bugs in test data.
+    "noUncheckedIndexedAccess": true, // arr[0] is T | undefined. Catches real bugs in test data.
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitOverride": true,
@@ -16,7 +16,7 @@
     // We never emit JS - Playwright transpiles specs itself. tsc is a type checker only.
     "noEmit": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,               // don't typecheck node_modules; big speedup
+    "skipLibCheck": true, // don't typecheck node_modules; big speedup
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
 

@@ -38,18 +38,18 @@ export default defineConfig({
   workers: IS_CI ? 1 : undefined,
 
   reporter: [
-    ['list'],                                        // readable terminal output
-    ['html', { open: 'never' }],                     // npm run report to view
+    ['list'], // readable terminal output
+    ['html', { open: 'never' }], // npm run report to view
   ],
 
   use: {
-    baseURL: BASE_URL,                               // lets specs do page.goto('/auth/login')
-    trace: 'on-first-retry',                         // full trace when something fails; cheap
+    baseURL: BASE_URL, // lets specs do page.goto('/auth/login')
+    trace: 'on-first-retry', // full trace when something fails; cheap
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    actionTimeout: 15_000,                           // per click/fill, not per test
+    actionTimeout: 15_000, // per click/fill, not per test
     navigationTimeout: 30_000,
-    ignoreHTTPSErrors: true,                         // local container has no valid cert
+    ignoreHTTPSErrors: true, // local container has no valid cert
   },
 
   projects: [
