@@ -1,0 +1,25 @@
+node_modules/
+
+# Secrets - repo is public
+.env
+.env.*
+!.env.example
+
+# Playwright output
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+playwright/.auth/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Internal details (md files)
+SETUP.md
+details.md
+QA_Automation_Roadmap_OrangeHRM.md

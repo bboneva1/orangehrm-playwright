@@ -1,0 +1,53 @@
+# OrangeHRM test target, self-hosted.
+# Start:  docker compose up -d
+# Stop:   docker compose down          (keeps data - volumes survive)
+# Reset:  docker compose down -v       (wipes data - re-runs the install wizard)
+# Shell:  docker exec -it orangehrm sh
+
+services:
+  orangehrm-db:
+    image: mariadb:10.11
+    container_name: orangehrm-db
+    environment:
+      # Root password is only used by the OrangeHRM installer wizard.
+      MARIADB_ROOT_PASSWORD: rootpass
+      MARIADB_DATABASE: orangehrm
+      MARIADB_USER: orangehrm
+      MARIADB_PASSWORD: orangehrmpass
+    volumes:
+      # Named volume => DB survives `docker compose down`. Without this your
+      # seeded employees vanish every restart and every test looks flaky.
+      - orangehrm-db-data:/var/lib/mysql
+    healthcheck:
+      # The app container starts faster than MariaDB accepts connections.
+      # Without a healthcheck the installer errors on first boot.
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  orangehrm:
+    image: orangehrm/orangehrm:5.7
+    container_name: orangehrm
+    depends_on:
+      orangehrm-db:
+        condition: service_healthy
+    ports:
+      # host:container - app will be at http://localhost:8080
+      # 8080 not 80: 80 often collides with other things on Windows.
+      - "8080:80"
+    environment:
+      ORANGEHRM_DATABASE_HOST: orangehrm-db
+      ORANGEHRM_DATABASE_PORT: 3306
+      ORANGEHRM_DATABASE_NAME: orangehrm
+      ORANGEHRM_DATABASE_USER: orangehrm
+      ORANGEHRM_DATABASE_PASSWORD: orangehrmpass
+    volumes:
+      # Uploaded files, config written by the installer. Also needs to persist.
+      - orangehrm-app-data:/var/www/html
+    restart: unless-stopped
+
+volumes:
+  orangehrm-db-data:
+  orangehrm-app-data:
