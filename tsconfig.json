@@ -21,11 +21,12 @@
     "resolveJsonModule": true,
 
     // Path alias so specs import from '@pages/...' instead of '../../../pages/...'
-    "baseUrl": ".",
+    // No baseUrl: it's deprecated, and paths hasn't needed it since TS 4.1.
+    // Leading ./ makes each target relative to this file's folder.
     "paths": {
-      "@pages/*": ["src/pages/*"],
-      "@fixtures/*": ["src/fixtures/*"],
-      "@utils/*": ["src/utils/*"]
+      "@pages/*": ["./src/pages/*"],
+      "@fixtures/*": ["./src/fixtures/*"],
+      "@utils/*": ["./src/utils/*"]
     },
     "types": ["node"]
   },

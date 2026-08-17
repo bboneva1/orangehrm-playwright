@@ -44,7 +44,7 @@ export default defineConfig({
 
   use: {
     baseURL: BASE_URL, // lets specs do page.goto('/auth/login')
-    trace: 'on-first-retry', // full trace when something fails; cheap
+    trace: IS_CI ? 'on-first-retry' : 'retain-on-failure', // local: trace on any failure. CI: only on retry.
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     actionTimeout: 15_000, // per click/fill, not per test
@@ -68,4 +68,6 @@ export default defineConfig({
 export const credentials = {
   username: required('ORANGEHRM_ADMIN_USER'),
   password: required('ORANGEHRM_ADMIN_PASSWORD'),
+  firstName: required('ORANGEHRM_FIRST_NAME'),
+  lastName: required('ORANGEHRM_LAST_NAME'),
 };
