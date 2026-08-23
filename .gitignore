@@ -19,7 +19,5 @@ Thumbs.db
 !.vscode/settings.json
 !.vscode/extensions.json
 
-# Internal details (md files)
-SETUP.md
-details.md
-QA_Automation_Roadmap_OrangeHRM.md
+# Private notes - roadmap, phase write-ups, cheatsheet, local details
+notes/

@@ -2,7 +2,13 @@
 # Start:  docker compose up -d
 # Stop:   docker compose down          (keeps data - volumes survive)
 # Reset:  docker compose down -v       (wipes data - re-runs the install wizard)
-# Shell:  docker exec -it orangehrm sh
+# Shell:  docker exec -it orangehrm bash    (bash exists here; `exit` to leave)
+# Logs:   docker logs --tail 20 --follow orangehrm     (Ctrl+C to stop)
+#
+# Read logs from OUTSIDE the container, not by shelling in. Inside,
+# /var/log/apache2/*.log are symlinks to stdout/stderr, not real files -
+# `tail` on them prints nothing and never finishes, which also freezes the
+# shell so `exit` stops responding. Ctrl+C is the way out.
 
 services:
   orangehrm-db:
