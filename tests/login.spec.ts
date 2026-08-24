@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { credentials } from '../playwright.config';
+import { credentials } from '@utils/env';
 
 test.describe('Authentication', () => {
   test('admin can log in and reach the dashboard', async ({ page }) => {

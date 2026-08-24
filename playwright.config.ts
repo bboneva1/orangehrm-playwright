@@ -1,18 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
-import dotenv from 'dotenv';
+import { BASE_URL } from '@utils/env';
+import { ADMIN_STORAGE_STATE } from '@utils/paths';
 
-// Load .env before defineConfig runs, so process.env is populated when the
-// config object below is evaluated. Order matters here.
-dotenv.config();
-
-// Fail loudly at config time rather than getting a confusing error 30s into a run.
-function required(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing required env var: ${name}. Copy .env.example to .env.`);
-  return value;
-}
-
-const BASE_URL = process.env.BASE_URL ?? 'http://localhost:8080';
 const IS_CI = !!process.env.CI;
 
 export default defineConfig({
@@ -53,9 +42,20 @@ export default defineConfig({
   },
 
   projects: [
+    // Runs first. Logs in through the UI and writes the session to ADMIN_STORAGE_STATE.
+    // No storageState of its own - it must start logged OUT, that's the whole job.
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: ADMIN_STORAGE_STATE, // every test starts already logged in
+      },
+      dependencies: ['setup'], // don't start until 'setup' has finished
+      testIgnore: /.*\.setup\.ts/, // setup already ran it; don't run it again here
     },
     // Firefox / WebKit / mobile viewports land in Phase C, once page objects exist.
     // Adding them now just multiplies the noise from a single login test.
@@ -63,11 +63,3 @@ export default defineConfig({
 
   outputDir: './test-results',
 });
-
-// Exported so tests/fixtures can read credentials from one place.
-export const credentials = {
-  username: required('ORANGEHRM_ADMIN_USER'),
-  password: required('ORANGEHRM_ADMIN_PASSWORD'),
-  firstName: required('ORANGEHRM_FIRST_NAME'),
-  lastName: required('ORANGEHRM_LAST_NAME'),
-};
