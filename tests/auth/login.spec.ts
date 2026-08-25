@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { credentials } from '@utils/env';
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe('Authentication', () => {
   test('admin can log in and reach the dashboard', async ({ page }) => {
     await page.goto('/web/index.php/auth/login');
