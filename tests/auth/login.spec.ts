@@ -11,7 +11,9 @@ test.describe('Authentication', () => {
     await loginPage.login(credentials.username, credentials.password);
 
     await expect(page).toHaveURL(/\/dashboard\//);
-    //TODO: move once DashboardPage object exists.
-    await expect(page.getByText(credentials.firstName + ' ' + credentials.lastName)).toBeVisible();
+    //TO DO: move once DashboardPage object exists.
+    await expect(
+      page.getByRole('banner').getByText(credentials.firstName + ' ' + credentials.lastName)
+    ).toBeVisible();
   });
 });

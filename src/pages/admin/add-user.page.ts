@@ -52,8 +52,8 @@ export class AddUserPage {
   }
 
   private async selectFromDropdown(label: string, option: string): Promise<void> {
-    // The inputs have no placeholder and the label is a separate element, so getByRole
-    // can't name them. Each locator scopes to the .oxd-input-group containing the label.
+    // OrangeHRM dropdowns are custom widgets, not <select>, so selectOption() doesn't work.
+    // Find the group by its label, click "-- Select --" to open it, then click the option by its text.
     const group = this.page.locator('.oxd-input-group').filter({ hasText: label });
     await group.getByText('-- Select --').click();
     await this.page.getByRole('option', { name: option, exact: true }).click();
