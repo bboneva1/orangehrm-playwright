@@ -57,9 +57,11 @@ npm test
 ```
 tests/            specs
   auth.setup.ts   logs in once per run, saves the session
-  auth/           logged-out specs
-src/fixtures/     custom fixtures
-src/pages/        page objects (Phase C)
+  auth/           logged-out specs (login, failed login)
+  pim/            employees: add, search, edit
+  admin/          user management: search, add
+src/fixtures/     custom fixtures (authenticated page, page objects)
+src/pages/        page objects, one folder per module
 src/utils/        env reading, shared paths
 ```
 
@@ -77,8 +79,8 @@ Instead:
    `storageState`, so every test starts already authenticated.
 3. A **custom fixture** hands tests a page already landed on the dashboard, so specs don't each
    repeat the same `goto`.
-4. **`tests/auth/login.spec.ts` opts out** with `test.use({ storageState: { cookies: [], origins: [] } })`
-   — it's the one test that must exercise the login form for real.
+4. **The specs in `tests/auth/` opt out** with `test.use({ storageState: { cookies: [], origins: [] } })`
+   — they're the ones that must exercise the login form for real, including failed logins.
 
 ## Conventions
 
@@ -95,5 +97,5 @@ person's container is hardcoded — anyone cloning this runs their own.
 
 - **Phase A — Foundation** ✅ Docker Compose, TypeScript, Playwright config, `.env` handling, linting, pre-commit secret scan, first login test
 - **Phase B — Auth & Fixtures** ✅ storage state, setup project, dependency ordering, first custom fixture
-- **Phase C — Page objects, locators & accessibility** — next
+- **Phase C — Page objects, locators & accessibility** 🚧 page objects for login, PIM and Admin; page objects provided via fixtures. Cross-browser and accessibility next.
 - Phases D–G: test data & API testing, CI, hardening, QA process artefacts
