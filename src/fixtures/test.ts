@@ -2,6 +2,7 @@ import { AddUserPage } from '@pages/admin/add-user.page';
 import { UserManagementPage } from '@pages/admin/user-management.page';
 import { AddEmployeePage } from '@pages/pim/add-employee.page';
 import { EmployeeListPage } from '@pages/pim/employee-list.page';
+import { EmployeeDetailsPage } from '@pages/pim/employee-details.page';
 import { test as base, type Page } from '@playwright/test';
 
 type Fixtures = {
@@ -10,6 +11,7 @@ type Fixtures = {
   addEmployeePage: AddEmployeePage;
   userManagementPage: UserManagementPage;
   addUserPage: AddUserPage;
+  employeeDetailsPage: EmployeeDetailsPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -32,6 +34,10 @@ export const test = base.extend<Fixtures>({
 
   addUserPage: async ({ authPage }, use) => {
     await use(new AddUserPage(authPage));
+  },
+
+  employeeDetailsPage: async ({ authPage }, use) => {
+    await use(new EmployeeDetailsPage(authPage));
   },
 });
 
