@@ -3,6 +3,8 @@ import { UserManagementPage } from '@pages/admin/user-management.page';
 import { AddEmployeePage } from '@pages/pim/add-employee.page';
 import { EmployeeListPage } from '@pages/pim/employee-list.page';
 import { EmployeeDetailsPage } from '@pages/pim/employee-details.page';
+import { JobTitlesPage } from '@pages/admin/job-titles.page';
+import { AddJobTitlePage } from '@pages/admin/add-job-title.page';
 import { test as base, type Page } from '@playwright/test';
 
 type Fixtures = {
@@ -12,6 +14,8 @@ type Fixtures = {
   userManagementPage: UserManagementPage;
   addUserPage: AddUserPage;
   employeeDetailsPage: EmployeeDetailsPage;
+  jobTitlesPage: JobTitlesPage;
+  addJobTitlePage: AddJobTitlePage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -38,6 +42,14 @@ export const test = base.extend<Fixtures>({
 
   employeeDetailsPage: async ({ authPage }, use) => {
     await use(new EmployeeDetailsPage(authPage));
+  },
+
+  jobTitlesPage: async ({ authPage }, use) => {
+    await use(new JobTitlesPage(authPage));
+  },
+
+  addJobTitlePage: async ({ authPage }, use) => {
+    await use(new AddJobTitlePage(authPage));
   },
 });
 
