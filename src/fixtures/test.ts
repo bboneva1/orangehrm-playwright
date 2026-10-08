@@ -6,6 +6,8 @@ import { EmployeeDetailsPage } from '@pages/pim/employee-details.page';
 import { JobTitlesPage } from '@pages/admin/job-titles.page';
 import { AddJobTitlePage } from '@pages/admin/add-job-title.page';
 import { test as base, type Page } from '@playwright/test';
+import { ApplyLeavePage } from '@pages/leave/apply-leave.page';
+import { MyLeavePage } from '@pages/leave/my-leave.page';
 
 type Fixtures = {
   authPage: Page;
@@ -16,6 +18,8 @@ type Fixtures = {
   employeeDetailsPage: EmployeeDetailsPage;
   jobTitlesPage: JobTitlesPage;
   addJobTitlePage: AddJobTitlePage;
+  applyLeavePage: ApplyLeavePage;
+  myLeavePage: MyLeavePage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -50,6 +54,14 @@ export const test = base.extend<Fixtures>({
 
   addJobTitlePage: async ({ authPage }, use) => {
     await use(new AddJobTitlePage(authPage));
+  },
+
+  applyLeavePage: async ({ authPage }, use) => {
+    await use(new ApplyLeavePage(authPage));
+  },
+
+  myLeavePage: async ({ authPage }, use) => {
+    await use(new MyLeavePage(authPage));
   },
 });
 

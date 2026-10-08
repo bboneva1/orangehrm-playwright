@@ -41,6 +41,15 @@ npx playwright install chromium
 npm test
 ```
 
+## Preconditions
+
+To run the Leave-related specs, you need to pre-create a leave type to use in the test.
+
+1. Create a leave type in OrangeHRM (Leave → Configure → Leave Types)
+2. Give the admin user an entitlement for that type for the current leave period (Leave → Entitlements → Add)
+3. Set LEAVE_TYPE in .env to that leave type's exact name
+   note that the entitlement has to be renewed each year.
+
 ## Commands
 
 | Task               | Command                                                 |

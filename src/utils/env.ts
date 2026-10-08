@@ -16,3 +16,6 @@ export const credentials = {
   firstName: required('ORANGEHRM_FIRST_NAME'),
   lastName: required('ORANGEHRM_LAST_NAME'),
 };
+
+// A leave type with an entitlement for the admin user, created by hand (see README).
+export const leaveType = required('LEAVE_TYPE');
