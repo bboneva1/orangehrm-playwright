@@ -16,3 +16,7 @@ that tends to grow into a dumping ground. `AddEmployeePage` would inherit code i
 
 Revisit after Step 5 (Admin). Even then, a small helper that page objects call (composition) may fit
 better than a base class they inherit from.
+
+Decision: the dropdown logic stays a private method in each page object (option A).
+Why: only two copies so far (AddUserPage, ApplyLeavePage).
+What would change it: a third copy → extract a shared helper function (option B).
