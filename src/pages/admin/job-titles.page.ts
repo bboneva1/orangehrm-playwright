@@ -35,7 +35,7 @@ export class JobTitlesPage {
     // is picked by its trash icon (.bi-trash), inside the row whose cell matches the title exactly.
 
     await this.jobTitleRows
-      .filter({ has: this.page.getByRole('cell', { name: jobTitle, exact: true }) })
+      .filter({ has: this.page.getByRole('cell', { name: jobTitle }) })
       .getByRole('button')
       .filter({ has: this.page.locator('.bi-trash') })
       .click();

@@ -12,19 +12,19 @@ test.describe('Negative cases for authentication', () => {
     await loginPage.goTo();
   });
 
-  test('Wrong password', async () => {
+  test('Wrong password', { tag: '@mobile' }, async () => {
     await loginPage.login(credentials.username, 'wrong-password');
 
     expect(await loginPage.errorMessage()).toBe('Invalid credentials');
   });
 
-  test('Wrong user', async () => {
+  test('Wrong user', { tag: '@mobile' }, async () => {
     await loginPage.login('wrong-username', credentials.password);
 
     expect(await loginPage.errorMessage()).toBe('Invalid credentials');
   });
 
-  test('Empty fields', async () => {
+  test('Empty fields', { tag: '@mobile' }, async () => {
     await loginPage.login('', '');
 
     expect(await loginPage.emptyFieldError('Username')).toContain('Required');

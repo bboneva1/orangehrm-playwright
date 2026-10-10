@@ -22,9 +22,10 @@ export default defineConfig({
   // don't block a PR. Phase F revisits this deliberately.
   retries: IS_CI ? 1 : 0,
 
-  // Undefined => Playwright picks based on CPU cores. Pinned to 1 in CI until
-  // Phase D gives us data isolation - parallel tests sharing one OrangeHRM DB collide.
-  workers: IS_CI ? 1 : undefined,
+  // Locally capped at 2: with 4 browser projects, the CPU-based default ran so many browsers at
+  // once against one OrangeHRM container that actions froze mid-fill (environment, not test bugs).
+  // Pinned to 1 in CI until Phase D gives us data isolation - parallel tests sharing one DB collide.
+  workers: IS_CI ? 1 : 2,
 
   reporter: [
     ['list'], // readable terminal output
@@ -57,8 +58,34 @@ export default defineConfig({
       dependencies: ['setup'], // don't start until 'setup' has finished
       testIgnore: /.*\.setup\.ts/, // setup already ran it; don't run it again here
     },
-    // Firefox / WebKit / mobile viewports land in Phase C, once page objects exist.
-    // Adding them now just multiplies the noise from a single login test.
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: ADMIN_STORAGE_STATE, // every test starts already logged in
+      },
+      dependencies: ['setup'], // don't start until 'setup' has finished
+      testIgnore: /.*\.setup\.ts/, // setup already ran it; don't run it again here
+    },
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        storageState: ADMIN_STORAGE_STATE, // every test starts already logged in
+      },
+      dependencies: ['setup'], // don't start until 'setup' has finished
+      testIgnore: /.*\.setup\.ts/, // setup already ran it; don't run it again here
+    },
+    {
+      name: 'mobile',
+      grep: /@mobile/, //mobile runs only tests tagged @mobile (see README)
+      use: {
+        ...devices['Pixel 7'],
+        storageState: ADMIN_STORAGE_STATE, // every test starts already logged in
+      },
+      dependencies: ['setup'], // don't start until 'setup' has finished
+      testIgnore: /.*\.setup\.ts/, // setup already ran it; don't run it again here
+    },
   ],
 
   outputDir: './test-results',
