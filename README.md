@@ -37,9 +37,13 @@ Fill in `.env` with the admin username, password and full name you just created.
 gitignored and must stay that way.
 
 ```bash
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 npm test
 ```
+
+The suite runs in four projects: **chromium**, **firefox**, **webkit** (Playwright's own WebKit build,
+close to Safari) and **mobile** (Chromium imitating a Pixel 7 phone). Run a single one with
+`npx playwright test --project=firefox`.
 
 ## Preconditions
 
@@ -68,7 +72,8 @@ tests/            specs
   auth.setup.ts   logs in once per run, saves the session
   auth/           logged-out specs (login, failed login)
   pim/            employees: add, search, edit
-  admin/          user management: search, add
+  admin/          user management: search, add; job titles
+  leave/          apply for leave and cancel it
 src/fixtures/     custom fixtures (authenticated page, page objects)
 src/pages/        page objects, one folder per module
 src/utils/        env reading, shared paths
@@ -84,12 +89,28 @@ Instead:
 
 1. A **setup project** runs first and logs in once, saving the browser session to
    `playwright/.auth/admin.json` (gitignored — it holds a live session cookie).
-2. The **chromium project** declares `dependencies: ['setup']` and loads that session via
+2. Every **browser project** declares `dependencies: ['setup']` and loads that session via
    `storageState`, so every test starts already authenticated.
 3. A **custom fixture** hands tests a page already landed on the dashboard, so specs don't each
    repeat the same `goto`.
 4. **The specs in `tests/auth/` opt out** with `test.use({ storageState: { cookies: [], origins: [] } })`
    — they're the ones that must exercise the login form for real, including failed logins.
+
+## Cross-browser and mobile
+
+**Mobile runs a subset.** Only tests tagged `@mobile` run in the mobile project (`grep: /@mobile/`
+in the config). On a phone-sized screen OrangeHRM hides the sidebar and the user's name behind the
+menu, and folds the search filters on list pages away. Tests that rely on those are desktop tests by
+nature. Making every page object handle both layouts would add branching to all of them for little
+extra coverage. A documented subset is simpler and honest about what mobile covers.
+
+**Tests that create data use unique values per browser.** All projects share one OrangeHRM database
+and run in parallel, so two browsers creating the same thing at once collide (e.g. the same leave
+dates, or the same auto-suggested Employee Id). Each test generates its own unique values until
+Phase D gives every test its own data.
+
+**Workers are capped at 2 locally.** Four projects at the default worker count overloaded the
+machine and browsers froze mid-action. Fewer workers is slower but stable.
 
 ## Conventions
 
@@ -106,5 +127,5 @@ person's container is hardcoded — anyone cloning this runs their own.
 
 - **Phase A — Foundation** ✅ Docker Compose, TypeScript, Playwright config, `.env` handling, linting, pre-commit secret scan, first login test
 - **Phase B — Auth & Fixtures** ✅ storage state, setup project, dependency ordering, first custom fixture
-- **Phase C — Page objects, locators & accessibility** 🚧 page objects for login, PIM and Admin; page objects provided via fixtures. Cross-browser and accessibility next.
+- **Phase C — Page objects, locators & accessibility** 🚧 page objects for login, PIM, Admin and Leave; page objects provided via fixtures; Chromium, Firefox, WebKit and a mobile subset. Accessibility next.
 - Phases D–G: test data & API testing, CI, hardening, QA process artefacts

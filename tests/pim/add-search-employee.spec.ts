@@ -8,10 +8,11 @@ test('Admin can add an employee and find it in the list', async ({
   //TODO: Phase D — cleanup. Each run adds a new employee to the database.
   const firstName = 'Test';
   const lastName = `Employee${Date.now()}`;
+  const employeeId = String(Date.now()).slice(-8);
 
   await employeeListPage.goTo();
   await employeeListPage.openAddEmployeeForm();
-  await addEmployeePage.addEmployee(firstName, lastName);
+  await addEmployeePage.addEmployee(firstName, lastName, employeeId);
 
   await expect(authPage).toHaveURL(/\/pim\/viewPersonalDetails\//);
 
