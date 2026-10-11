@@ -21,6 +21,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.9.0",
     "@playwright/test": "^1.47.0",
     "@types/node": "^22.5.0",
