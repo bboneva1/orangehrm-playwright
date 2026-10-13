@@ -40,6 +40,19 @@ Import via aliases: `@pages/*`, `@fixtures/*`, `@utils/*`.
   Anyone cloning this runs their own container with their own admin.
 - Every `await`-able call is awaited (`no-floating-promises` is an error).
 
+## OrangeHRM locator patterns
+
+- **Inputs with no placeholder have no accessible name.** Find the `.oxd-input-group` containing the
+  label text, then the textbox inside it:
+  `page.locator('.oxd-input-group').filter({ hasText: 'Username' }).getByRole('textbox')`.
+- **Dropdowns are custom widgets, no `<select>`, so `selectOption()` doesn't work.** Find the group by its label, click "-- Select --" to open it, then click the option by role and name.
+- **Autocomplete fields fill the text, then click the suggestion by its option role.** Use two actions with `.fill()` and next `.click()` in separate rows.
+- **Tables have proper row/cell roles.** The `.filter(...)` keeps rows that contain a cell, which drops the header row, because the header has column headings, not cells.
+- **Icon-only buttons (trash, pencil) have no name.** scope to the row, then pick the button by its icon class.
+- **Save loads a new page.** In the spec, wait with `await expect(page).toHaveURL(/.../)`
+  before reading the next page, or the read can crash mid-navigation (flaky).
+- **Accessibility: the axe settings and the known-violations list live only in the axe fixture.** `axe` doesn't wait, so wait for the page to load before `analyze()`.
+
 ## Working rule
 
 Bily attempts first, then asks for review. Exception: config and boilerplate.
