@@ -74,7 +74,8 @@ tests/            specs
   pim/            employees: add, search, edit
   admin/          user management: search, add; job titles
   leave/          apply for leave and cancel it
-src/fixtures/     custom fixtures (authenticated page, page objects)
+  a11y.spec.ts    accessibility scans: dashboard, PIM, Admin
+src/fixtures/     custom fixtures (authenticated page, page objects, axe)
 src/pages/        page objects, one folder per module
 src/utils/        env reading, shared paths
 ```
@@ -112,6 +113,23 @@ Phase D gives every test its own data.
 **Workers are capped at 2 locally.** Four projects at the default worker count overloaded the
 machine and browsers froze mid-action. Fewer workers is slower but stable.
 
+## Accessibility checks
+
+`tests/a11y.spec.ts` scans the dashboard, the PIM employee list and the Admin user list with
+[axe-core](https://github.com/dequelabs/axe-core), after each page has finished loading.
+
+**Only new kinds of problems fail.** The scans run the WCAG 2.0 and 2.1 level A and AA rules.
+OrangeHRM already breaks five of them on every page (icon buttons with no name, unlabelled form
+fields, text with too little contrast, a missing page language and a malformed menu list), so those
+five are switched off. A strict "zero violations" check would have been red from day one, and a
+test that is always red gets ignored. The switched-off rules are listed in one place, the `axe`
+fixture, with the date the list was made. A rule comes off the list once OrangeHRM fixes it.
+
+**What this deliberately lets through:** best-practice rules, more of the five known problems (a
+new unlabelled field still passes), and anything axe can't detect, such as OrangeHRM's custom
+dropdowns. They're plain `div`s that a screen reader can't recognise as form fields, so axe can't
+either.
+
 ## Conventions
 
 Locator priority is `getByRole` → `getByLabel` → `getByText` → `data-testid` → CSS as a last resort.
@@ -127,5 +145,5 @@ person's container is hardcoded — anyone cloning this runs their own.
 
 - **Phase A — Foundation** ✅ Docker Compose, TypeScript, Playwright config, `.env` handling, linting, pre-commit secret scan, first login test
 - **Phase B — Auth & Fixtures** ✅ storage state, setup project, dependency ordering, first custom fixture
-- **Phase C — Page objects, locators & accessibility** 🚧 page objects for login, PIM, Admin and Leave; page objects provided via fixtures; Chromium, Firefox, WebKit and a mobile subset. Accessibility next.
+- **Phase C — Page objects, locators & accessibility** ✅ page objects for login, dashboard, PIM, Admin and Leave; page objects provided via fixtures; Chromium, Firefox, WebKit and a mobile subset; axe accessibility scans with a documented policy
 - Phases D–G: test data & API testing, CI, hardening, QA process artefacts
