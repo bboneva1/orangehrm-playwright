@@ -4,6 +4,8 @@ export class DashboardPage {
   private readonly page: Page;
   private readonly widgetTitles: Locator;
   private readonly loadingSpinners: Locator;
+  private readonly userName: Locator;
+  private readonly sidebarPanel: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -11,6 +13,8 @@ export class DashboardPage {
     // so these use OrangeHRM's CSS classes (last resort, see CLAUDE.md).
     this.widgetTitles = page.locator('.orangehrm-dashboard-widget-name');
     this.loadingSpinners = page.locator('.oxd-loading-spinner');
+    this.userName = page.getByRole('banner').getByRole('paragraph');
+    this.sidebarPanel = page.getByRole('navigation', { name: 'Sidepanel' });
   }
 
   async goTo(): Promise<void> {
@@ -24,5 +28,13 @@ export class DashboardPage {
     const widgets = await this.widgetTitles.count();
     const spinners = await this.loadingSpinners.count();
     return widgets > 0 && spinners === 0;
+  }
+
+  async loggedInUserName(): Promise<string> {
+    return this.userName.innerText();
+  }
+
+  async sidebarVisible(): Promise<boolean> {
+    return this.sidebarPanel.isVisible();
   }
 }
