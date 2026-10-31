@@ -26,7 +26,8 @@
     "paths": {
       "@pages/*": ["./src/pages/*"],
       "@fixtures/*": ["./src/fixtures/*"],
-      "@utils/*": ["./src/utils/*"]
+      "@utils/*": ["./src/utils/*"],
+      "@api/*": ["./src/api/*"]
     },
     "types": ["node"]
   },
