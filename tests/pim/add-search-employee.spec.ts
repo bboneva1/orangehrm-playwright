@@ -1,4 +1,5 @@
 import { test, expect } from '@fixtures/test';
+import { buildEmployee } from '@utils/factories';
 
 test('Admin can add an employee and find it in the list', async ({
   authPage,
@@ -6,9 +7,7 @@ test('Admin can add an employee and find it in the list', async ({
   addEmployeePage,
 }) => {
   //TODO: Phase D — cleanup. Each run adds a new employee to the database.
-  const firstName = 'Test';
-  const lastName = `Employee${Date.now()}`;
-  const employeeId = String(Date.now()).slice(-8);
+  const { firstName, lastName, employeeId } = buildEmployee();
 
   await employeeListPage.goTo();
   await employeeListPage.openAddEmployeeForm();

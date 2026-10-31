@@ -1,14 +1,13 @@
 import { test, expect } from '@fixtures/test';
+import { buildEmployee } from '@utils/factories';
 
 test(
   'Admin can edit an employee name',
   { tag: '@mobile' },
   async ({ authPage, employeeListPage, addEmployeePage, employeeDetailsPage }) => {
-    const firstName = 'Test';
-    const lastName = `Employee${Date.now()}`;
-    const newFirstName = 'Edited';
-    const newLastName = `Edited${Date.now()}`;
-    const employeeId = String(Date.now()).slice(-8);
+    const { firstName, lastName, employeeId } = buildEmployee();
+    const newFirstName = `Edited${firstName}`;
+    const newLastName = `${lastName}Edited`;
 
     // TODO: Phase D — cleanup
     await employeeListPage.goTo();

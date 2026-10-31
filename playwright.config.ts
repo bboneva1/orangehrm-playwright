@@ -50,13 +50,20 @@ export default defineConfig({
       testMatch: /.*\.setup\.ts/,
     },
     {
+      name: 'api',
+      testMatch: /tests\/api\/.*\.spec\.ts/,
+      use: { storageState: ADMIN_STORAGE_STATE },
+      dependencies: ['setup'],
+    },
+    {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
         storageState: ADMIN_STORAGE_STATE, // every test starts already logged in
       },
       dependencies: ['setup'], // don't start until 'setup' has finished
-      testIgnore: /.*\.setup\.ts/, // setup already ran it; don't run it again here
+      testIgnore: [/.*\.setup\.ts/, /tests\/api\//], // setup already ran it; don't run it again here;
+      //APi tests run in 'api'
     },
     {
       name: 'firefox',
@@ -65,7 +72,8 @@ export default defineConfig({
         storageState: ADMIN_STORAGE_STATE, // every test starts already logged in
       },
       dependencies: ['setup'], // don't start until 'setup' has finished
-      testIgnore: /.*\.setup\.ts/, // setup already ran it; don't run it again here
+      testIgnore: [/.*\.setup\.ts/, /tests\/api\//], // setup already ran it; don't run it again here,
+      //APi tests run in 'api'
     },
     {
       name: 'webkit',
@@ -74,7 +82,8 @@ export default defineConfig({
         storageState: ADMIN_STORAGE_STATE, // every test starts already logged in
       },
       dependencies: ['setup'], // don't start until 'setup' has finished
-      testIgnore: /.*\.setup\.ts/, // setup already ran it; don't run it again here
+      testIgnore: [/.*\.setup\.ts/, /tests\/api\//], // setup already ran it; don't run it again here,
+      //APi tests run in 'api'
     },
     {
       name: 'mobile',
@@ -84,7 +93,8 @@ export default defineConfig({
         storageState: ADMIN_STORAGE_STATE, // every test starts already logged in
       },
       dependencies: ['setup'], // don't start until 'setup' has finished
-      testIgnore: /.*\.setup\.ts/, // setup already ran it; don't run it again here
+      testIgnore: [/.*\.setup\.ts/, /tests\/api\//], // setup already ran it; don't run it again here,
+      //APi tests run in 'api'
     },
   ],
 

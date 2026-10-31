@@ -10,6 +10,8 @@ import { MyLeavePage } from '@pages/leave/my-leave.page';
 import { AxeBuilder } from '@axe-core/playwright';
 import { DashboardPage } from '@pages/dashboard.page';
 import { test as base, type Page } from '@playwright/test';
+import { buildEmployee, NewEmployee } from '@utils/factories';
+import { EmployeesApi } from '@api/employees.api';
 
 type Fixtures = {
   authPage: Page;
@@ -24,6 +26,7 @@ type Fixtures = {
   myLeavePage: MyLeavePage;
   axe: AxeBuilder;
   dashboardPage: DashboardPage;
+  testEmployee: NewEmployee & { empNumber: number };
 };
 
 //only WCAG A/AA rules (2.0 and 2.1) run, and the known ones are switched off.
@@ -84,6 +87,14 @@ export const test = base.extend<Fixtures>({
 
   dashboardPage: async ({ authPage }, use) => {
     await use(new DashboardPage(authPage));
+  },
+
+  testEmployee: async ({ request }, use) => {
+    const employeesApi = new EmployeesApi(request);
+    const employee = buildEmployee();
+    const empNumber = await employeesApi.create(employee);
+    await use({ ...employee, empNumber });
+    await employeesApi.delete(empNumber);
   },
 });
 
