@@ -21,3 +21,7 @@ Thumbs.db
 
 # Private notes - roadmap, phase write-ups, cheatsheet, local details
 notes/
+
+postman/
+
+.postman/
