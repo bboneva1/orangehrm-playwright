@@ -1,12 +1,14 @@
 import { Page, Locator } from '@playwright/test';
 
 export class EmployeeDetailsPage {
+  private readonly page: Page;
   private readonly firstNameField: Locator;
   private readonly lastNameField: Locator;
   private readonly saveButton: Locator;
   private readonly successGrowler: Locator;
 
   constructor(page: Page) {
+    this.page = page;
     this.firstNameField = page.getByRole('textbox', { name: 'First Name' });
     this.lastNameField = page.getByRole('textbox', { name: 'Last Name' });
     this.saveButton = page
@@ -14,6 +16,10 @@ export class EmployeeDetailsPage {
       .filter({ has: this.firstNameField })
       .getByRole('button', { name: 'Save' });
     this.successGrowler = page.getByText('Successfully Updated');
+  }
+
+  async goTo(empNumber: number): Promise<void> {
+    await this.page.goto(`/web/index.php/pim/viewPersonalDetails/empNumber/${empNumber}`);
   }
 
   async editName(firstName: string, lastName: string): Promise<void> {
