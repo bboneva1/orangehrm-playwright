@@ -12,6 +12,7 @@ import { AxeBuilder } from '@axe-core/playwright';
 import { DashboardPage } from '@pages/dashboard.page';
 import { buildEmployee, NewEmployee } from '@utils/factories';
 import { EmployeesApi } from '@api/employees.api';
+import { UsersApi } from '@api/users.api';
 
 type Fixtures = {
   authPage: Page;
@@ -28,6 +29,7 @@ type Fixtures = {
   dashboardPage: DashboardPage;
   testEmployee: NewEmployee & { empNumber: number };
   employeesToDelete: number[];
+  usersToDelete: string[];
 };
 
 //only WCAG A/AA rules (2.0 and 2.1) run, and the known ones are switched off.
@@ -104,6 +106,16 @@ export const test = base.extend<Fixtures>({
     const employeesApi = new EmployeesApi(request);
     for (const empNumber of empNumbers) {
       await employeesApi.delete(empNumber);
+    }
+  },
+
+  usersToDelete: async ({ request }, use) => {
+    const usernames: string[] = [];
+    await use(usernames);
+    const usersApi = new UsersApi(request);
+    for (const username of usernames) {
+      const id = await usersApi.findId(username);
+      await usersApi.delete(id);
     }
   },
 });
