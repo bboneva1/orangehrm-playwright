@@ -1,3 +1,4 @@
+import { test as base, type Page } from '@playwright/test';
 import { AddUserPage } from '@pages/admin/add-user.page';
 import { UserManagementPage } from '@pages/admin/user-management.page';
 import { AddEmployeePage } from '@pages/pim/add-employee.page';
@@ -9,7 +10,6 @@ import { ApplyLeavePage } from '@pages/leave/apply-leave.page';
 import { MyLeavePage } from '@pages/leave/my-leave.page';
 import { AxeBuilder } from '@axe-core/playwright';
 import { DashboardPage } from '@pages/dashboard.page';
-import { test as base, type Page } from '@playwright/test';
 import { buildEmployee, NewEmployee } from '@utils/factories';
 import { EmployeesApi } from '@api/employees.api';
 
@@ -27,6 +27,7 @@ type Fixtures = {
   axe: AxeBuilder;
   dashboardPage: DashboardPage;
   testEmployee: NewEmployee & { empNumber: number };
+  employeesToDelete: number[];
 };
 
 //only WCAG A/AA rules (2.0 and 2.1) run, and the known ones are switched off.
@@ -95,6 +96,15 @@ export const test = base.extend<Fixtures>({
     const empNumber = await employeesApi.create(employee);
     await use({ ...employee, empNumber });
     await employeesApi.delete(empNumber);
+  },
+
+  employeesToDelete: async ({ request }, use) => {
+    const empNumbers: number[] = [];
+    await use(empNumbers);
+    const employeesApi = new EmployeesApi(request);
+    for (const empNumber of empNumbers) {
+      await employeesApi.delete(empNumber);
+    }
   },
 });
 
