@@ -36,4 +36,13 @@ export class EmployeeDetailsPage {
   async lastName(): Promise<string> {
     return this.lastNameField.inputValue();
   }
+
+  empNumber(): number {
+    const url = this.page.url();
+    const empNumber = Number(url.split('/').pop());
+    if (Number.isNaN(empNumber)) {
+      throw new Error(`No empNumber at the end of the URL: ${url}`);
+    }
+    return empNumber;
+  }
 }

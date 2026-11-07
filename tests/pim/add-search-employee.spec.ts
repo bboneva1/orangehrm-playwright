@@ -5,8 +5,9 @@ test('Admin can add an employee and find it in the list', async ({
   authPage,
   employeeListPage,
   addEmployeePage,
+  employeesToDelete,
+  employeeDetailsPage,
 }) => {
-  //TODO: Phase D — cleanup. Each run adds a new employee to the database.
   const { firstName, lastName, employeeId } = buildEmployee();
 
   await employeeListPage.goTo();
@@ -14,6 +15,7 @@ test('Admin can add an employee and find it in the list', async ({
   await addEmployeePage.addEmployee(firstName, lastName, employeeId);
 
   await expect(authPage).toHaveURL(/\/pim\/viewPersonalDetails\//);
+  employeesToDelete.push(employeeDetailsPage.empNumber());
 
   await employeeListPage.goTo();
   await employeeListPage.searchByName(`${firstName} ${lastName}`);
