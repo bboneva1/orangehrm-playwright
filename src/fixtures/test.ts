@@ -13,6 +13,7 @@ import { DashboardPage } from '@pages/dashboard.page';
 import { buildEmployee, NewEmployee } from '@utils/factories';
 import { EmployeesApi } from '@api/employees.api';
 import { UsersApi } from '@api/users.api';
+import { JobTitlesApi } from '@api/job-titles.api';
 
 type Fixtures = {
   authPage: Page;
@@ -30,6 +31,7 @@ type Fixtures = {
   testEmployee: NewEmployee & { empNumber: number };
   employeesToDelete: number[];
   usersToDelete: string[];
+  jobTitlesToDelete: string[];
 };
 
 //only WCAG A/AA rules (2.0 and 2.1) run, and the known ones are switched off.
@@ -116,6 +118,18 @@ export const test = base.extend<Fixtures>({
     for (const username of usernames) {
       const id = await usersApi.findId(username);
       await usersApi.delete(id);
+    }
+  },
+
+  jobTitlesToDelete: async ({ request }, use) => {
+    const jobTitles: string[] = [];
+    await use(jobTitles);
+    const jobTitlesApi = new JobTitlesApi(request);
+    for (const jobtitle of jobTitles) {
+      const id = await jobTitlesApi.findId(jobtitle);
+      if (id !== undefined) {
+        await jobTitlesApi.delete(id);
+      }
     }
   },
 });
