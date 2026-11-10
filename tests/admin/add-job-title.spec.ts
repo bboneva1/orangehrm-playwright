@@ -1,8 +1,13 @@
 import { expect, test } from '@fixtures/test';
 
-test('Add a job Title and delete', async ({ authPage, jobTitlesPage, addJobTitlePage }) => {
-  // TO DO: Phase D cleanup only runs if the test gets that far
+test('Add a job Title and delete', async ({
+  authPage,
+  jobTitlesPage,
+  addJobTitlePage,
+  jobTitlesToDelete,
+}) => {
   const jobTitle = `QA Engineer ${Date.now()}`;
+  jobTitlesToDelete.push(jobTitle);
   const jobDescription = 'First level';
 
   await jobTitlesPage.goTo();
