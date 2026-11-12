@@ -25,3 +25,8 @@ notes/
 postman/
 
 .postman/
+
+# Python side exercise
+.venv/
+__pycache__/
+.pytest_cache/
