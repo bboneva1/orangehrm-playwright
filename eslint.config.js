@@ -4,7 +4,7 @@ import prettier from 'eslint-config-prettier';
 
 // Flat config (ESLint 9). Array of config objects, applied in order.
 export default tseslint.config(
-  { ignores: ['node_modules', 'test-results', 'playwright-report', 'dist'] },
+  { ignores: ['node_modules', 'test-results', 'playwright-report', 'dist', '**/.venv'] },
 
   js.configs.recommended,
   ...tseslint.configs.recommended,
