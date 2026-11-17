@@ -10,6 +10,8 @@ Playwright + TypeScript framework testing a self-hosted OrangeHRM. Repo is **pub
 | Stop app              | `npm run app:down`                                      |
 | Wipe + restart app    | `npm run app:reset`                                     |
 | Run tests             | `npm test`                                              |
+| API tests only        | `npx playwright test --project=api`                     |
+| Python exercise       | `python\.venv\Scripts\python.exe -m pytest python`      |
 | Interactive runner    | `npm run test:ui`                                       |
 | View report           | `npm run report`                                        |
 | Lint / format / types | `npm run lint` / `npm run format` / `npm run typecheck` |
@@ -17,13 +19,16 @@ Playwright + TypeScript framework testing a self-hosted OrangeHRM. Repo is **pub
 ## Directory map
 
 ```
-tests/          specs
-src/pages/      page objects        (Phase C)
-src/fixtures/   custom fixtures     (Phase B)
-src/utils/      helpers, factories  (Phase D)
+tests/          UI specs
+tests/api/      API specs: own 'api' project, no browser
+src/pages/      page objects
+src/api/        API helpers, one class per resource
+src/fixtures/   custom fixtures, incl. test data and cleanup
+src/utils/      helpers, factories
+python/         Python side exercise (pytest + requests), own .venv
 ```
 
-Import via aliases: `@pages/*`, `@fixtures/*`, `@utils/*`.
+Import via aliases: `@pages/*`, `@fixtures/*`, `@utils/*`, `@api/*`.
 
 ## Conventions
 
@@ -39,6 +44,31 @@ Import via aliases: `@pages/*`, `@fixtures/*`, `@utils/*`.
 - Instance-specific values (admin name, credentials, base URL) come from `.env` — never hardcoded.
   Anyone cloning this runs their own container with their own admin.
 - Every `await`-able call is awaited (`no-floating-promises` is an error).
+
+## Test data
+
+- **Test data comes from factories** in `src/utils/factories.ts` (`buildEmployee()`), not inline
+  `Date.now()`. A factory only builds data in memory; saving it is the API helper's job.
+- **Data a test needs but isn't testing is created through the API**, in a fixture (e.g.
+  `testEmployee`). Only the thing under test goes through the screen.
+- **Cleanup lives in fixture teardown** (code after `await use()`), which runs even when the test
+  fails. Never as the last lines of a test. Data the test creates itself on screen: push its id or
+  name into `employeesToDelete` / `usersToDelete` / `jobTitlesToDelete`.
+- **API helpers live in `src/api/`.** They take an `APIRequestContext`, contain no `expect`, and
+  throw with the status and body when a response isn't OK.
+- **Known gap:** leave requests can't be deleted, only cancelled, so `apply-leave` leaves rows behind.
+
+## OrangeHRM API patterns
+
+- Endpoints are under `/web/index.php/api/v2/`. Find a new one in DevTools → Network → Fetch/XHR
+  while doing the action by hand.
+- **Not textbook — test what it does:** create answers `200` (not 201); a missing item answers `422`
+  (not 404); invalid fields are listed in `error.data.invalidParamKeys`; no session answers `401`
+  with `Session expired`.
+- Lists return `data` (an array) and `meta.total`. Delete is `DELETE <endpoint>` with a body
+  `{ "ids": [...] }`.
+- The `request` fixture is already logged in (same `storageState`). For a logged-out request, use
+  `test.use({ storageState: { cookies: [], origins: [] } })` inside a `test.describe`.
 
 ## OrangeHRM locator patterns
 
@@ -59,5 +89,7 @@ Bily attempts first, then asks for review. Exception: config and boilerplate.
 Do not write test bodies unless asked.
 Explain in detail — Bily is learning Docker, Git and the terminal. Give the reasoning and what to
 expect on screen, not just the command to run.
+Bily is new to Python. For a new concept, either explain it first or show the finished code with a
+note on each line — don't describe the steps in prose and leave the syntax to guess.
 
 <!-- Add every style correction you give Claude to this file. Keep it short. -->
