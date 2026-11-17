@@ -16,6 +16,7 @@ produces phantom failures that look like flake but aren't.
 - Docker Compose (OrangeHRM + MariaDB, persistent volume)
 - ESLint, Prettier
 - Husky + gitleaks (pre-commit secret scanning)
+- Python side exercise: pytest + requests
 
 ## Getting started
 
@@ -61,6 +62,8 @@ To run the Leave-related specs, you need to pre-create a leave type to use in th
 | Start / stop app   | `npm run app:up` / `npm run app:down`                   |
 | Wipe + restart app | `npm run app:reset`                                     |
 | Run tests          | `npm test`                                              |
+| API tests only     | `npx playwright test --project=api`                     |
+| Python exercise    | see [Python side exercise](#python-side-exercise)       |
 | Interactive runner | `npm run test:ui`                                       |
 | View last report   | `npm run report`                                        |
 | Lint / format      | `npm run lint` / `npm run format` / `npm run typecheck` |
@@ -71,17 +74,20 @@ To run the Leave-related specs, you need to pre-create a leave type to use in th
 tests/            specs
   auth.setup.ts   logs in once per run, saves the session
   auth/           logged-out specs (login, failed login)
+  api/            API contract tests for the employees endpoint
   pim/            employees: add, search, edit
   admin/          user management: search, add; job titles
   leave/          apply for leave and cancel it
   a11y.spec.ts    accessibility scans: dashboard, PIM, Admin
-src/fixtures/     custom fixtures (authenticated page, page objects, axe)
+src/api/          API helpers: create, find and delete employees, users, job titles
+src/fixtures/     custom fixtures (authenticated page, page objects, axe, test data + cleanup)
 src/pages/        page objects, one folder per module
-src/utils/        env reading, shared paths
+src/utils/        env reading, shared paths, test data factories
+python/           Python side exercise (pytest + requests)
 ```
 
-Imports use path aliases — `@pages/*`, `@fixtures/*`, `@utils/*` — so moving a spec between folders
-doesn't break its imports.
+Imports use path aliases — `@pages/*`, `@fixtures/*`, `@utils/*`, `@api/*` — so moving a spec
+between folders doesn't break its imports.
 
 ## How authentication works
 
@@ -107,11 +113,84 @@ extra coverage. A documented subset is simpler and honest about what mobile cove
 
 **Tests that create data use unique values per browser.** All projects share one OrangeHRM database
 and run in parallel, so two browsers creating the same thing at once collide (e.g. the same leave
-dates, or the same auto-suggested Employee Id). Each test generates its own unique values until
-Phase D gives every test its own data.
+dates, or the same auto-suggested Employee Id). Test employees come from a factory that combines the
+time with a random number, so no two tests get the same name or Id (see [Test data](#test-data)).
 
 **Workers are capped at 2 locally.** Four projects at the default worker count overloaded the
 machine and browsers froze mid-action. Fewer workers is slower but stable.
+
+## Test data
+
+**Test data comes from a factory.** `buildEmployee()` in `src/utils/factories.ts` returns a unique
+first name, last name and Employee Id. Last names start with `PW`, so test data is easy to tell
+apart from real data. The factory only builds the data in memory. Saving it is a separate step, so
+the same data works for a UI test or an API test.
+
+**Setup goes through the API; the screen is only for what's being tested.** `edit-employee` tests
+editing, so it doesn't click through the Add Employee form first. The `testEmployee` fixture creates
+the employee with one API request and hands it to the test. That's faster, and it removes a chain of
+clicks that could fail for reasons that have nothing to do with editing.
+
+### Cleanup
+
+Data created by tests is deleted in a fixture, after the test. This was chosen because the code
+after `await use()` runs even if the test fails.
+
+**Why not the alternatives** — deleting at the end of the test (inside the test itself) risks that,
+if the test fails before it gets there, the data is never cleaned up. Resetting the database wipes
+out everything, including the admin and its credentials, so the login setup would fail on the next
+run. Creating a new admin for every run would add unnecessary steps to the setup.
+
+**What it doesn't catch** — if a whole run crashes or is stopped, the fixtures never get to clean
+up. This could be fixed with a script that runs before or after each run and deletes everything
+carrying the test marker (last names starting with `PW`). Leave requests can't be deleted at all,
+only cancelled — that's an OrangeHRM restriction — so `apply-leave` still leaves cancelled rows
+behind.
+
+## API tests
+
+`tests/api/` tests the OrangeHRM API on its own, without a browser. These are **contract tests**:
+they check the shape of the answer (which fields come back, and what type each one is), not the
+screen. The OrangeHRM web page relies on those answers; if `firstName` were renamed, the page would
+show blanks. A contract test catches that in milliseconds.
+
+**They run in their own `api` project, once per run.** Under chromium, firefox and webkit they would
+send the same requests three times and prove nothing new, so the browser projects ignore
+`tests/api/`. The `api` project still depends on `setup`: it reuses the saved session, so its
+requests are logged in.
+
+**The tests describe what OrangeHRM actually does**, which isn't always what a textbook API does:
+
+| Request                       | Textbook answer | OrangeHRM answers                                         |
+| ----------------------------- | --------------- | --------------------------------------------------------- |
+| create an employee            | 201 Created     | 200                                                       |
+| read a deleted employee       | 404 Not Found   | 422 Invalid Parameter                                     |
+| create without `firstName`    | 400 or 422      | 422, the field listed under `error.data.invalidParamKeys` |
+| any request without a session | 401             | 401, message `Session expired`                            |
+
+## Python side exercise
+
+`python/` repeats three of the API tests in Python, with [pytest](https://docs.pytest.org/) (a test
+runner) and [requests](https://requests.readthedocs.io/) (a library for sending HTTP requests): the
+employee list returns 200; create, read and delete an employee; a missing `firstName` returns 422.
+The framework itself stays TypeScript.
+
+The Python tests log in on their own, the way the login form does: they read a one-time token from
+the login page, then send it with the username and password from `.env`. They don't need the
+Playwright setup to run first.
+
+You'll need Python 3, the app running and `.env` filled in. From the project root (Windows):
+
+```
+py -m venv python\.venv
+python\.venv\Scripts\python.exe -m pip install -r python\requirements.txt
+python\.venv\Scripts\python.exe -m pytest python
+```
+
+The first line creates a private package folder for the exercise, the second installs pytest,
+requests and python-dotenv into it, and the third runs the tests. Only the third is needed on later
+runs. On macOS or Linux, use `python3 -m venv python/.venv`, then `python/.venv/bin/python` in place
+of `python\.venv\Scripts\python.exe`.
 
 ## Accessibility checks
 
@@ -146,4 +225,5 @@ person's container is hardcoded — anyone cloning this runs their own.
 - **Phase A — Foundation** ✅ Docker Compose, TypeScript, Playwright config, `.env` handling, linting, pre-commit secret scan, first login test
 - **Phase B — Auth & Fixtures** ✅ storage state, setup project, dependency ordering, first custom fixture
 - **Phase C — Page objects, locators & accessibility** ✅ page objects for login, dashboard, PIM, Admin and Leave; page objects provided via fixtures; Chromium, Firefox, WebKit and a mobile subset; axe accessibility scans with a documented policy
-- Phases D–G: test data & API testing, CI, hardening, QA process artefacts
+- **Phase D — Test data & API testing** ✅ test data factory; set-up data created through the API; cleanup in fixture teardown; API helpers for employees, users and job titles; contract tests in their own `api` project; Python side exercise with pytest
+- Phases E–G: CI, hardening, QA process artefacts
